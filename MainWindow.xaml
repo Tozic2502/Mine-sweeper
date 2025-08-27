@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Mine_sweeper"
         mc:Ignorable="d"
-        Title="MainWindow" Height="500" Width="879">
+        Title="MainWindow" Height="800" Width="1200">
     <Grid x:Name="Main">
         <StackPanel x:Name="StartMenu">
             <TextBox HorizontalAlignment="Center" Margin="0,20,0,80" TextWrapping="Wrap" Text="MineSweeper" VerticalAlignment="Top" Width="188" Height="47" FontSize="24" FontWeight="Bold" FontFamily="Broadway"/>

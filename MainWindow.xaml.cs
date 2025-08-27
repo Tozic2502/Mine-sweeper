@@ -12,9 +12,6 @@ using System.Windows.Threading;
 
 namespace Mine_sweeper
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         private int rows, cols, mines;
@@ -26,12 +23,9 @@ namespace Mine_sweeper
             InitializeComponent();
         }
 
-        
-
-        private void Easy_Click(object sender, RoutedEventArgs e) => StartGame(10, 20, 10);
-
-        private void Normal_Click(object sender, RoutedEventArgs e) => StartGame(15, 30, 40);
-        private void Hard_Click(object sender, RoutedEventArgs e) => StartGame(20, 40, 100);
+        private void Easy_Click(object sender, RoutedEventArgs e) => StartGame(8, 10, 10);
+        private void Normal_Click(object sender, RoutedEventArgs e) => StartGame(14, 18, 20);
+        private void Hard_Click(object sender, RoutedEventArgs e) => StartGame(20, 24, 100);
 
         private void StartGame(int r, int c, int m)
         {
@@ -65,8 +59,9 @@ namespace Mine_sweeper
                     placedMines++;
                 }
             }
-            foreach (var tile in tiles)
-                tile.AdjacentMines = CountAdjacentMines(tile);
+            for (int y = 0; y < rows; y++)
+                for (int x = 0; x < cols; x++)
+                    tiles[y, x].AdjacentMines = CountAdjacentMines(y, x);
 
             seconds = 0;
             TimerText.Text = "time: 0";
@@ -74,9 +69,9 @@ namespace Mine_sweeper
             timer.Interval = TimeSpan.FromSeconds(1);
             timer.Tick += (s, e) => { seconds++; TimerText.Text = "time: " + seconds; };
             timer.Start();
-
         }
-        private int CountAdjacentMines(Tile tile)
+
+        private int CountAdjacentMines(int row, int col)
         {
             int count = 0;
             for (int dy = -1; dy <= 1; dy++)
@@ -84,87 +79,86 @@ namespace Mine_sweeper
                 for (int dx = -1; dx <= 1; dx++)
                 {
                     if (dy == 0 && dx == 0) continue;
-                    int ny = tile.Row + dy;
-                    int nx = tile.Col + dx;
-                    if (ny >= 0 && ny < rows && nx >= 0 && nx < cols && tiles[ny, nx].IsMine)
-                        count++;
+                    int ny = row + dy;
+                    int nx = col + dx;
+                    if (ny >= 0 && ny < rows && nx >= 0 && nx < cols)
+                        if (tiles[ny, nx].IsMine) count++;
                 }
             }
             return count;
         }
+
+        private IEnumerable<Tile> GetNeighbors(Tile t)
+        {
+            for (int dy = -1; dy <= 1; dy++)
+            {
+                for (int dx = -1; dx <= 1; dx++)
+                {
+                    if (dy == 0 && dx == 0) continue;
+                    int ny = t.Y + dy;
+                    int nx = t.X + dx;
+                    if (ny >= 0 && ny < rows && nx >= 0 && nx < cols)
+                        yield return tiles[ny, nx];
+                }
+            }
+        }
+
         private void Tile_Click(object sender, RoutedEventArgs e)
         {
             Tile t = (Tile)sender;
             if (t.IsRevealed) return;
 
-            if(t.IsMine)
+            if (t.IsMine)
             {
                 t.Reveal();
                 GameOver();
             }
             else
             {
-                Reveal(t);
+                RevealTile(t);
                 CheckWin();
-                   
             }
         }
-        private void Reveal(Tile t)
+
+        private void RevealTile(Tile t)
         {
             if (t.IsRevealed) return;
             t.Reveal();
 
-            if (t.AdjacentMines == 0)
+            if (!t.IsMine && t.AdjacentMines == 0)
             {
-             foreach(var n in GetNeighbors(t))
-             {
-                    Reveal(n);
-             }
+                foreach (var n in GetNeighbors(t))
+                {
+                    RevealTile(n);
+                }
             }
-           
         }
+
         private void CheckWin()
         {
-            foreach(var tile in tiles)
+            foreach (var tile in tiles)
             {
-                if(!tile.IsMine && !tile.IsRevealed)
+                if (!tile.IsMine && !tile.IsRevealed)
                     return;
             }
             timer.Stop();
             MessageBox.Show("You Win! Time: " + seconds + " seconds");
             ResetGame();
         }
+
         private void GameOver()
         {
             timer.Stop();
             foreach (var t in tiles)
-                t.Reveal();
+                t.Reveal(); // No parameter needed
             MessageBox.Show("Game Over");
             ResetGame();
         }
+
         private void ResetGame()
         {
             GamePanel.Visibility = Visibility.Collapsed;
             StartMenu.Visibility = Visibility.Visible;
         }
-        private Tile[] GetNeighbors(Tile tile)
-        {
-            var list = new System.Collections.Generic.List<Tile>();
-            for (int y = -1; y <= 1; y++)
-            {
-                for (int x = -1; x <= 1; x++)
-                {
-                    if (x == 0 && y == 0) continue;
-                    int nx = tile.X - x;
-                    int ny = tile.Y - y;
-                    if (nx >= 0 && nx < cols && ny >= 0 && ny < rows)
-                    {
-                        list.Add(tiles[ny, nx]);
-                    }
-                }
-            }
-            return list.ToArray();
-        }
-
     }
 }
