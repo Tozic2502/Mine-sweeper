@@ -18,14 +18,26 @@ namespace Mine_sweeper
         private Tile[,] tiles;
         private DispatcherTimer timer;
         private int seconds;
+        private const int EWIDTH = 10;
+        private const int EHEIGHT = 8;
+        private const int EMINES = 10;
+
+        private const int NWIDTH = 18;
+        private const int NHEIGHT = 14;
+        private const int NMINES = 20;
+
+        private const int HWIDTH = 24;
+        private const int HHEIGHT = 20;
+        private const int HMINES = 100;
+
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        private void Easy_Click(object sender, RoutedEventArgs e) => StartGame(8, 10, 10);
-        private void Normal_Click(object sender, RoutedEventArgs e) => StartGame(14, 18, 20);
-        private void Hard_Click(object sender, RoutedEventArgs e) => StartGame(20, 24, 100);
+        private void Easy_Click(object sender, RoutedEventArgs e) => StartGame(EHEIGHT, EWIDTH, EMINES);
+        private void Normal_Click(object sender, RoutedEventArgs e) => StartGame(NHEIGHT, NWIDTH, NMINES);
+        private void Hard_Click(object sender, RoutedEventArgs e) => StartGame(HHEIGHT, HWIDTH, HMINES);
 
         private void StartGame(int r, int c, int m)
         {
